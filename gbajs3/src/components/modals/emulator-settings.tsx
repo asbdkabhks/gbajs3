@@ -50,6 +50,8 @@ export type EmulatorSettings = {
   threadedVideo: boolean;
   rewindEnable: boolean;
   showFpsCounter: boolean;
+  // POC only, this should be a part of the settings API
+  shader?: string;
 };
 
 const StyledForm = styled.form`
@@ -105,16 +107,22 @@ export const EmulatorSettingsModal = () => {
       audioSync: emulatorSettings?.audioSync ?? false,
       threadedVideo: emulatorSettings?.threadedVideo ?? false,
       rewindEnable: emulatorSettings?.rewindEnable ?? true,
-      showFpsCounter: emulatorSettings?.showFpsCounter ?? false
+      showFpsCounter: emulatorSettings?.showFpsCounter ?? false,
+      // POC only
+      shader: emulatorSettings?.shader ?? ''
     }
   });
   const baseId = useId();
 
   const defaultAudioSampleRates = emulator?.defaultAudioSampleRates();
   const defaultAudioBufferSizes = emulator?.defaultAudioBufferSizes();
+  const defaultShaderPaths = emulator
+    ?.listShaders()
+    ?.filter((ss) => ss !== '.' && ss !== '..');
 
   const onSubmit: SubmitHandler<EmulatorSettings> = ({
     saveFileName,
+    shader,
     ...rest
   }) => {
     setEmulatorSettings({
@@ -122,7 +130,8 @@ export const EmulatorSettingsModal = () => {
       saveFileName:
         !!saveFileName && saveFileName !== emulator?.getCurrentSaveName()
           ? saveFileName
-          : undefined
+          : undefined,
+      shader
     });
 
     addCallbacks({
@@ -145,6 +154,11 @@ export const EmulatorSettingsModal = () => {
       rewindEnable: rest.rewindEnable,
       showFpsCounter: rest.showFpsCounter
     });
+
+    // POC Only
+    if (shader && isRunning)
+      emulator?.loadShader(`${emulator?.filePaths().shaderPath}/${shader}`);
+    else if (emulatorSettings?.shader) emulator?.unloadShader();
   };
 
   const resetEmulatorSettings = () => {
@@ -470,6 +484,22 @@ export const EmulatorSettingsModal = () => {
               />
             )}
           />
+          <FormControl id={`${baseId}--shader`} size="small">
+            <InputLabel>Shader</InputLabel>
+            <Select
+              label="Shader"
+              value={watch('shader')}
+              defaultValue=""
+              {...register('shader')}
+            >
+              <MenuItem value={''}>No Shader</MenuItem>
+              {defaultShaderPaths?.map((shaderPath, idx) => (
+                <MenuItem key={`${shaderPath}_${idx}`} value={shaderPath}>
+                  {shaderPath}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
           <GridContainer>
             <ManagedCheckbox
               id={`${baseId}--allow-opposing-directions`}

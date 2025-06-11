@@ -70,6 +70,10 @@ export type GBAEmulator = {
   uploadSaveOrSaveState: (file: File, callback?: () => void) => void;
   toggleRewind: (enabled: boolean) => void;
   setCoreSettings: (coreSettings: coreSettings) => void;
+  // POC only
+  listShaders: () => string[];
+  loadShader: (shaderPath: string) => void;
+  unloadShader: () => void;
 };
 
 export const KEY_LOCATION_STANDARD = 0;
@@ -284,6 +288,10 @@ export const mGBAEmulator = (mGBA: mGBAEmulatorTypeDef): GBAEmulator => {
     setCoreSettings: mGBA.setCoreSettings,
     listAllFiles,
     parseCheatsString,
-    parsedCheatsToFile
+    parsedCheatsToFile,
+    // POC only
+    listShaders: mGBA.listShaders,
+    loadShader: mGBA.loadShader,
+    unloadShader: mGBA.unloadShader
   };
 };

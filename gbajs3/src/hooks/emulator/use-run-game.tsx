@@ -92,6 +92,12 @@ export const useRunGame = () => {
           rewindEnable: emulatorSettings.rewindEnable,
           showFpsCounter: emulatorSettings.showFpsCounter
         });
+
+        // POC only
+        if (emulatorSettings.shader)
+          emulator?.loadShader(
+            `${emulator?.filePaths().shaderPath}/${emulatorSettings.shader}`
+          );
       }
 
       return !!isSuccessfulRun;
