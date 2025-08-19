@@ -1,0 +1,10 @@
+{
+  "name": "gbajs3-vercel",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "./build.sh",
+    "dev": "./build.sh && cd client && npm run dev",
+    "install": "cd client && npm install"
+  }
+}
